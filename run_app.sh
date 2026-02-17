@@ -17,6 +17,8 @@ else
     fi
 fi
 
-# Run the Flask app
-echo "Starting Web Server..."
-python3 app.py
+# Run the Flask app with Gunicorn (Production)
+echo "Starting Web Server (Gunicorn)..."
+# -w 4: 4 worker processes
+# -b 0.0.0.0:5050: Bind to all interfaces on port 5050
+exec gunicorn -w 4 -b 0.0.0.0:5050 app:app

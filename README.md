@@ -51,6 +51,19 @@ python3 app.py
 ```
 *This script automatically sets up a virtual environment (`buffet_tag_env`) if needed.*
 
+### 3. Run in Background (Persistent)
+If you close the terminal, the app usually stops. To keep it running:
+
+```bash
+chmod +x start_background.sh stop_background.sh
+
+# Start both App and Bot in background
+./start_background.sh
+
+# Stop them later
+./stop_background.sh
+```
+
 ## Configuration
 1.  **Environment Variables**:
     - Copy `.env.example` to `.env`:

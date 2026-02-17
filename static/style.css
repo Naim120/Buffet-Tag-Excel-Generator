@@ -1,0 +1,399 @@
+:root {
+    /* Brand Palette */
+    --brand-teal: #155263;
+    --brand-orange: #ff6f3c;
+    --brand-orange-light: #ff9a3c;
+    --brand-yellow: #ffc93c;
+
+    /* Functional Mapping */
+    --primary: var(--brand-orange);
+    --primary-hover: #e55a2b;
+    /* Slightly darker shade of orange for hover */
+
+    --text-main: var(--brand-teal);
+    --text-muted: #587a85;
+    /* Desaturated teal */
+
+    --background: #e3dfd8;
+    /* Very light warm background to match the palette */
+    --surface: #ece3e3;
+
+    --border: #e6e6e6;
+    --border-focus: var(--brand-orange);
+
+    /* Spacing & Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(21, 82, 99, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(21, 82, 99, 0.1), 0 2px 4px -2px rgba(21, 82, 99, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--background);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 5px solid var(--brand-teal);
+    /* Top brand accent */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Outfit', sans-serif;
+    color: var(--brand-teal);
+    margin-top: 0;
+    font-weight: 700;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem 1.5rem;
+    margin: 0 auto;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(21, 82, 99, 0.1);
+}
+
+header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    /* Removed gradient for solid cleaner look, or keep it subtle */
+    color: var(--brand-teal);
+}
+
+.home-link {
+    text-decoration: none;
+    color: var(--brand-teal);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    background-color: white;
+    border: 1px solid rgba(21, 82, 99, 0.2);
+}
+
+.home-link:hover {
+    background-color: var(--brand-teal);
+    color: white;
+    border-color: var(--brand-teal);
+}
+
+/* Card */
+.card {
+    background: var(--surface);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(21, 82, 99, 0.1);
+}
+
+.card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--brand-yellow);
+    /* Yellow accent for headers */
+    display: inline-block;
+    width: 100%;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--brand-teal);
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #edeff2;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background-color: #fcfdfe;
+    color: var(--brand-teal);
+    /* Slight grey bg for inputs */
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--brand-orange);
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(255, 111, 60, 0.15);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.btn.primary {
+    background-color: var(--brand-orange);
+    color: white;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(255, 111, 60, 0.25);
+}
+
+.btn.primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(255, 111, 60, 0.35);
+}
+
+.btn.secondary {
+    background-color: transparent;
+    color: var(--brand-teal);
+    border: 2px solid var(--brand-teal);
+}
+
+.btn.secondary:hover {
+    background-color: var(--brand-teal);
+    color: white;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #edeff2;
+    gap: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-weight: 600;
+    margin-bottom: -2px;
+    /* Overlap border */
+}
+
+.tab-btn:hover {
+    color: var(--brand-teal);
+    background-color: rgba(21, 82, 99, 0.05);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.tab-btn.active {
+    color: var(--brand-teal);
+    border-bottom-color: var(--brand-orange);
+    background-color: rgba(255, 111, 60, 0.05);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Item Cards (Verification & Missing) */
+.item-card {
+    background: white;
+    border: 1px solid rgba(21, 82, 99, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    transition: all 0.2s;
+    border-left: 5px solid var(--brand-teal);
+    /* Brand accent on cards */
+}
+
+.item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--brand-orange-light);
+    border-left-color: var(--brand-orange);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #edeff2;
+    padding-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.item-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--brand-teal);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.item-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background-color: var(--brand-teal);
+    color: white;
+    font-weight: 600;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    border-radius: var(--radius-md);
+    border: 1px solid #edeff2;
+    transition: all 0.2s;
+    cursor: pointer;
+    background-color: white;
+    color: var(--brand-teal);
+}
+
+.checkbox-item:hover {
+    background-color: rgba(255, 154, 60, 0.1);
+    /* Light orange tint */
+    border-color: var(--brand-orange-light);
+}
+
+.checkbox-item input[type="checkbox"] {
+    accent-color: var(--brand-orange);
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+}
+
+/* Alerts */
+.flash-messages {
+    margin-bottom: 1.5rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.alert.error {
+    background-color: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+    border-left: 4px solid #f43f5e;
+}
+
+.alert.success {
+    background-color: #f0fdfa;
+    color: var(--brand-teal);
+    border: 1px solid #ccfbf1;
+    border-left: 4px solid var(--brand-teal);
+}
+
+/* Utils */
+.text-muted {
+    columns: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .card {
+        padding: 1.5rem 1rem;
+    }
+
+    .checkbox-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

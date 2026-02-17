@@ -1,0 +1,23 @@
+# Environments
+env/
+venv/
+telegram_env/
+.env
+
+# MacOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Application Data
+database.db
+data/temp_*.xlsx
+data/output/*.xlsx
+data/api_temp_*.xlsx
+
+# Logs
+*.log

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Missing Information</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">The following items are not in our database. Please
+        provide the details so we can update the database and
+        complete your Excel file.</p>
+
+    <form method="POST" action="/save_missing">
+        <!-- Pass the original list to preserve context/order if needed, or just to regenerate -->
+        <input type="hidden" name="original_list_json" value='{{ original_list | tojson }}'>
+
+        {% for item in missing_items %}
+        <div class="item-card">
+            <div class="item-header">
+                <h3 class="item-title">{{ item }}</h3>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ item }}_calories">Calories</label>
+                <input type="number" name="{{ item }}_calories" required placeholder="e.g. 150">
+            </div>
+
+            <div class="form-group">
+                <label style="margin-bottom: 0.75rem;">Allergens (Select all that apply)</label>
+                <div class="checkbox-grid">
+                    <!-- Standard 14 allergens + visible ones -->
+                    {% set allergens = ['Crustaceans', 'Molluscs', 'Fish', 'Soybeans', 'Gluten', 'Mustard', 'Sesame
+                    seeds', 'Celery', 'Eggs', 'Milk', 'Peanuts', 'Nuts', 'Sulphuite', 'Lupin'] %}
+                    {% for allergen in allergens %}
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="{{ item }}_allergens" value="{{ allergen }}"> {{ allergen }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn primary">Save & Generate</button>
+    </form>
+</div>
+{% endblock %}

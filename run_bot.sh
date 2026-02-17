@@ -1,11 +1,15 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-if [ ! -d "telegram_env" ]; then
-    python3 -m venv telegram_env
+if [ ! -d "venv" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv venv
+    source venv/bin/activate
+    echo "Installing dependencies..."
+    pip install -r requirements.txt
+else
+    source venv/bin/activate
 fi
 
-source telegram_env/bin/activate
-pip install -r requirements.txt
-
+echo "Starting Telegram Bot..."
 python3 telegram_bot/bot.py

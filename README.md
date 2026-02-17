@@ -16,26 +16,38 @@ This project allows users to generate Buffet Tag Excel files for Taj Hotels (spe
 
 1.  **Clone/Download** the repository.
 2.  **Install Dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-## Running the Application
-
-### 1. Web API (Flask Server)
-The Flask server handles the core logic and database interactions.
+### 1. Setup & Run Web App
+The project includes a helper script to set up the environment automatically.
 
 ```bash
-python3 app.py
+# Make script executable (first time only)
+chmod +x run_app.sh
+
+# Run the app
+./run_app.sh
 ```
-*Runs on `http://localhost:5000` by default.*
+This script will:
+1. Create a virtual environment (`venv`).
+2. Install all dependencies.
+3. Start the Flask server on `http://localhost:5000`.
 
-### 2. Telegram Bot
-The bot authenticates users and communicates with the Flask API.
-
+### 2. Run Telegram Bot (Optional)
+Open a new terminal window:
 ```bash
+# Make script executable
 chmod +x run_bot.sh
+
+# Run the bot
 ./run_bot.sh
+```
+
+### Manual Setup (If scripts fail)
+If you prefer creating the environment manually:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 app.py
 ```
 *This script automatically sets up a virtual environment (`buffet_tag_env`) if needed.*
 

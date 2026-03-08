@@ -16,6 +16,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 from excel_utils import extract_names_from_excel
+import session_manager
 
 # Configure logging
 logging.basicConfig(
@@ -136,9 +137,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "If an item is missing, I'll ask you for details."
     )
     if user_id == ADMIN_USER_ID:
-        msg += "\n\nAdmin Commands:\n/add_single - Add new item\n/add_multiple - Bulk upload\n/add_user <id> - Allow user"
+        msg += "\n\nAdmin Commands:\n/add_single - Add new item\n/add_multiple - Bulk upload\n/sessions - View active web sessions\n/add_user <id> - Allow user"
     
     await update.message.reply_text(msg)
+
+async def sessions_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command to list active web sessions."""
+    if update.effective_user.id != ADMIN_USER_ID:
+        await update.message.reply_text("Unauthorized.")
+        return
+        
+    sessions = session_manager.get_active_sessions()
+    
+    if not sessions:
+        await update.message.reply_text("No active web sessions at the moment.")
+        return
+        
+    msg_lines = [f"**Active Web Sessions ({len(sessions)})**\n"]
+    
+    for s in sessions:
+        size_kb = round(s['size_bytes'] / 1024, 2)
+        msg_lines.append(
+            f"• `{s['session_name']}`\n"
+            f"  Size: {size_kb} KB | Exp in: {s['remaining_mins']} mins\n"
+            f"  Last Saved: {s['last_updated']}\n"
+        )
+        
+    await update.message.reply_text("\n".join(msg_lines), parse_mode='Markdown')
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_allowed(update.effective_user.id):
@@ -555,6 +580,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('add_user', add_user_command))
+    application.add_handler(CommandHandler('sessions', sessions_command))
     
     # Register conversation handlers
     # Order matters? Specific commands usually first.

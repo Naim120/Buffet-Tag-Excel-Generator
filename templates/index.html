@@ -16,9 +16,24 @@
         </p>
         <form method="POST" action="/">
             <div class="form-group">
-                <textarea name="food_list" rows="10"
+                <textarea name="food_list" id="manual_food_list" rows="10"
                     placeholder="Example:&#10;BACON&#10;CHICKEN SAUSAGE&#10;BOILED EGG"></textarea>
             </div>
+            
+            <!-- Session Auto-Save UI -->
+            <div style="background-color: var(--surface); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 500; color: var(--text-main);">Session Auto-Save</span>
+                    <span id="save_status" style="font-size: 0.85rem; color: var(--text-muted);">Not saved yet</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: stretch;">
+                    <input type="text" id="session_name_input" placeholder="Session Name (Optional)" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                    <button type="button" class="btn secondary" onclick="recoverSession()" style="padding: 0.5rem 1rem; margin: 0; min-height: 100%;">Recover</button>
+                    <input type="hidden" id="current_session_full_name" value="">
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Data is automatically saved every 10 seconds and kept for 1.5 hours.</p>
+            </div>
+
             <button type="submit" class="btn primary">
                 Generate Excel
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -204,6 +219,104 @@
         } else if (tab) {
             showTab(tab);
         }
+        
+        // Initialize Auto-Save
+        setupAutoSave();
     });
+
+    // --- Session Auto-Save Logic ---
+    let lastSavedContent = "";
+    
+    function setupAutoSave() {
+        // Save every 10 seconds if content changed
+        setInterval(saveSession, 10000);
+    }
+
+    async function saveSession() {
+        const foodList = document.getElementById('manual_food_list').value;
+        const sessionNameInput = document.getElementById('session_name_input').value;
+        
+        // Don't save if empty or unchanged
+        if (!foodList.trim() || foodList === lastSavedContent) return;
+
+        const statusLabel = document.getElementById('save_status');
+        statusLabel.textContent = "Saving...";
+        
+        try {
+            const response = await fetch('/api/sessions/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_name: sessionNameInput,
+                    food_list: foodList
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const now = new Date();
+                statusLabel.textContent = `Saved at ${now.toLocaleTimeString()}`;
+                
+                // If user didn't provide a name, server generated one, let's keep it in the hidden field 
+                // so we don't keep creating new random sessions on every save.
+                const currentFullName = data.session_name; // e.g., Session-12345-08032026
+                document.getElementById('current_session_full_name').value = currentFullName;
+                
+                // If the user input was empty, fill it with the server-generated base name
+                if (!sessionNameInput) {
+                    // Extract base name by removing the "-ddmmyyyy" part
+                    const baseName = currentFullName.substring(0, currentFullName.lastIndexOf('-'));
+                    document.getElementById('session_name_input').value = baseName;
+                }
+                
+                lastSavedContent = foodList;
+            } else {
+                statusLabel.textContent = "Failed to save";
+                statusLabel.style.color = "red";
+            }
+        } catch (error) {
+            console.error("Auto-save error:", error);
+            statusLabel.textContent = "Offline / Save error";
+            statusLabel.style.color = "red";
+        }
+    }
+
+    async function recoverSession() {
+        const sessionNameInput = document.getElementById('session_name_input').value.trim();
+        const statusLabel = document.getElementById('save_status');
+        
+        if (!sessionNameInput) {
+            alert("Please enter a Session Name to recover.");
+            return;
+        }
+
+        statusLabel.textContent = "Recovering...";
+        statusLabel.style.color = "var(--text-muted)";
+        
+        try {
+            const response = await fetch(`/api/sessions/load/${encodeURIComponent(sessionNameInput)}`);
+            const data = await response.json();
+            
+            if (response.ok && data.status === 'success') {
+                document.getElementById('manual_food_list').value = data.data.food_list;
+                lastSavedContent = data.data.food_list; // Sync
+                
+                statusLabel.textContent = "Session recovered!";
+                statusLabel.style.color = "var(--brand-teal)";
+                
+                // Briefly flash the textarea
+                const ta = document.getElementById('manual_food_list');
+                ta.style.backgroundColor = "#e8f4f8";
+                setTimeout(() => ta.style.backgroundColor = "", 500);
+            } else {
+                alert(data.error || "Failed to recover session.");
+                statusLabel.textContent = "Recovery failed";
+            }
+        } catch (error) {
+            console.error("Recover error:", error);
+            alert("Error connecting to server for recovery.");
+            statusLabel.textContent = "Recovery error";
+        }
+    }
 </script>
 {% endblock %}

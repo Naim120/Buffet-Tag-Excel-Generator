@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 from database import get_food, add_food, get_db_connection
 from excel_utils import generate_excel, process_bulk_upload_excel, extract_names_from_excel
+import session_manager
 import os
 from dotenv import load_dotenv
 
@@ -214,6 +215,30 @@ def extract_names():
         return redirect(url_for('index', tab='extract'))
 
 # API Endpoints
+@app.route('/api/sessions/save', methods=['POST'])
+def api_sessions_save():
+    data = request.get_json()
+    if not data or 'food_list' not in data:
+        return {'error': 'Invalid request. "food_list" required.'}, 400
+        
+    session_name = data.get('session_name', '')
+    food_list = data['food_list']
+    
+    success, result_or_error = session_manager.save_session(session_name, food_list)
+    
+    if success:
+        return {'status': 'success', 'session_name': result_or_error}
+    else:
+        return {'error': result_or_error}, 500
+
+@app.route('/api/sessions/load/<session_base>', methods=['GET'])
+def api_sessions_load(session_base):
+    data, error = session_manager.load_session(session_base)
+    if error:
+        return {'error': error}, 404
+        
+    return {'status': 'success', 'data': data}
+
 @app.route('/api/extract_names', methods=['POST'])
 def api_extract_names():
     if 'file' not in request.files:

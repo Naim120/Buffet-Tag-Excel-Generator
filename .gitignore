@@ -21,3 +21,9 @@ data/api_temp_*.xlsx
 
 # Logs
 *.log
+
+# Process IDs
+*.pid
+
+# Sessions
+data/sessions/

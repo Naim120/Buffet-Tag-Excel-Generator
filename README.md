@@ -4,8 +4,10 @@ This project allows users to generate Buffet Tag Excel files for Taj Hotels (spe
 
 ## Features
 - **Web Interface**: Manual entry, Bulk Excel Upload, and Single Item Add.
-- **Telegram Bot**: Send food lists, handle missing items, add new items (Admin only), and User Allowlist.
-- **Excel Generation**: clean, formatted output based on `Mastersheet_TAJ_CAL27.xlsx`.
+- **Session Auto-Save**: Prevents data loss during manual entry by saving your progress locally with optional custom names (expires in 1.5 hours).
+- **Responsive UI**: Clean, side-by-side verification cards on desktop screens with full text wrapping.
+- **Telegram Bot**: Send food lists, handle missing items, add new items (Admin only), and manage active web sessions.
+- **Excel Generation**: Clean, formatted output based on `Mastersheet_TAJ_CAL27.xlsx`.
 - **Strict Validation**: Enforces standard item names and valid allergens (e.g., "Soy", "Sesame").
 
 ## Prerequisites
@@ -86,7 +88,9 @@ chmod +x start_background.sh stop_background.sh
 **Admin User ID**: Configured in `.env` (Variable: `ADMIN_USER_ID`)
 
 - `/add_single`: Start a conversation to add a new food item.
-- `/add_multiple`: Upload an- `/start`: Start the bot and check permission.
+- `/add_multiple`: Upload an Excel file for bulk addition.
+- `/sessions`: (Admin only) View all active web sessions, their sizes, and expiration times.
+- `/get_session <name>`: (Admin only) Retrieve the exact raw text data from a specific session in a copyable format.
 - `/add_user <user_id>`: (Admin only) Authorize a new user.
 - `/extract_names`: Extract food names from column D (rows 2-60) of an uploaded Excel file. Values are returned as a text list for easy copying.
 - `/cancel`: Cancel the current operation.

@@ -14,7 +14,7 @@ __pycache__/
 *.pyd
 
 # Application Data
-database.db
+*.db
 data/temp_*.xlsx
 data/output/*.xlsx
 data/api_temp_*.xlsx

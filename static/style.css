@@ -64,7 +64,7 @@ h6 {
 
 .container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     padding: 2rem 1.5rem;
     margin: 0 auto;
 }
@@ -316,7 +316,8 @@ select:focus {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    flex: 1; /* allow it to take available space */
+    flex: 1;
+    /* allow it to take available space */
 }
 
 .item-badge {

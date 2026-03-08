@@ -16,7 +16,7 @@
                     <div class="item-title">
                         <span class="item-badge" style="margin-top: 0.2rem;">#{{ loop.index }}</span>
                         <textarea name="name_{{ outer_index }}"
-                            oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                            oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
                             style="border: none; background: transparent; font-weight: 600; font-size: 1.1rem; color: var(--text-main); width: 100%; padding: 0; resize: none; overflow: hidden; font-family: inherit; line-height: 1.3;"
                             rows="1">{{ item.name }}</textarea>
                     </div>
@@ -44,9 +44,12 @@
         <script>
             // Ensure textareas are correctly sized on load
             document.addEventListener("DOMContentLoaded", function () {
-                document.querySelectorAll('textarea[name^="name_"]').forEach(function (ta) {
-                    ta.style.height = ta.scrollHeight + 'px';
-                });
+                setTimeout(() => {
+                    document.querySelectorAll('textarea[name^="name_"]').forEach(function (ta) {
+                        ta.style.height = 'auto';
+                        ta.style.height = ta.scrollHeight + 'px';
+                    });
+                }, 50);
             });
         </script>
 

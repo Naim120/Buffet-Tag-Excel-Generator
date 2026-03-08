@@ -34,7 +34,7 @@
 
         <p style="color: var(--text-muted); margin-bottom: 1rem;">Paste your list of food names below (one per line):
         </p>
-        <form method="POST" action="/">
+        <form method="POST" action="/" id="manual_form" onsubmit="handleManualSubmit(event)">
             <div class="form-group">
                 <textarea name="food_list" id="manual_food_list" rows="10"
                     placeholder="Example:&#10;BACON&#10;CHICKEN SAUSAGE&#10;BOILED EGG"></textarea>
@@ -245,6 +245,22 @@
         document.getElementById('save_status').style.color = "var(--brand-teal)";
         // Immediately trigger the first save
         await saveSession();
+    }
+
+    async function handleManualSubmit(event) {
+        // Prevent immediate submission to allow for an auto-save first
+        event.preventDefault();
+
+        // If they haven't explicitly started a session, do it now via the form submission
+        if (!isSessionActive) {
+            await startSession();
+        } else {
+            // If active, force one last save
+            await saveSession();
+        }
+
+        // Now submit the form natively
+        document.getElementById('manual_form').submit();
     }
 
     async function saveSession() {

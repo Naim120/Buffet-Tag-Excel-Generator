@@ -12,26 +12,32 @@
     </div>
 
     <div id="manual" class="tab-content active">
+        <!-- Session Auto-Save UI -->
+        <div
+            style="background-color: var(--surface); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 500; color: var(--text-main);">Session Auto-Save</span>
+                <span id="save_status" style="font-size: 0.85rem; color: var(--text-muted);">Session not started</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap;">
+                <input type="text" id="session_name_input" placeholder="Session Name (Optional)"
+                    style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); min-width: 200px;">
+                <button type="button" class="btn secondary" onclick="startSession()"
+                    style="padding: 0.5rem 1rem; margin: 0;">Start Session</button>
+                <button type="button" class="btn secondary" onclick="recoverSession()"
+                    style="padding: 0.5rem 1rem; margin: 0;">Recover Session</button>
+                <input type="hidden" id="current_session_full_name" value="">
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Click "Start Session" to begin
+                auto-saving data for 1.5 hours.</p>
+        </div>
+
         <p style="color: var(--text-muted); margin-bottom: 1rem;">Paste your list of food names below (one per line):
         </p>
         <form method="POST" action="/">
             <div class="form-group">
                 <textarea name="food_list" id="manual_food_list" rows="10"
                     placeholder="Example:&#10;BACON&#10;CHICKEN SAUSAGE&#10;BOILED EGG"></textarea>
-            </div>
-            
-            <!-- Session Auto-Save UI -->
-            <div style="background-color: var(--surface); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <span style="font-weight: 500; color: var(--text-main);">Session Auto-Save</span>
-                    <span id="save_status" style="font-size: 0.85rem; color: var(--text-muted);">Not saved yet</span>
-                </div>
-                <div style="display: flex; gap: 0.5rem; align-items: stretch;">
-                    <input type="text" id="session_name_input" placeholder="Session Name (Optional)" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
-                    <button type="button" class="btn secondary" onclick="recoverSession()" style="padding: 0.5rem 1rem; margin: 0; min-height: 100%;">Recover</button>
-                    <input type="hidden" id="current_session_full_name" value="">
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Data is automatically saved every 10 seconds and kept for 1.5 hours.</p>
             </div>
 
             <button type="submit" class="btn primary">
@@ -219,29 +225,40 @@
         } else if (tab) {
             showTab(tab);
         }
-        
+
         // Initialize Auto-Save
         setupAutoSave();
     });
 
     // --- Session Auto-Save Logic ---
     let lastSavedContent = "";
-    
+    let isSessionActive = false;
+
     function setupAutoSave() {
-        // Save every 10 seconds if content changed
+        // Interval runs every 10 seconds, but save action aborts if session not active
         setInterval(saveSession, 10000);
     }
 
+    async function startSession() {
+        isSessionActive = true;
+        document.getElementById('save_status').textContent = "Session started. Saving...";
+        document.getElementById('save_status').style.color = "var(--brand-teal)";
+        // Immediately trigger the first save
+        await saveSession();
+    }
+
     async function saveSession() {
+        if (!isSessionActive) return;
+
         const foodList = document.getElementById('manual_food_list').value;
         const sessionNameInput = document.getElementById('session_name_input').value;
-        
+
         // Don't save if empty or unchanged
         if (!foodList.trim() || foodList === lastSavedContent) return;
 
         const statusLabel = document.getElementById('save_status');
         statusLabel.textContent = "Saving...";
-        
+
         try {
             const response = await fetch('/api/sessions/save', {
                 method: 'POST',
@@ -251,24 +268,25 @@
                     food_list: foodList
                 })
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 const now = new Date();
                 statusLabel.textContent = `Saved at ${now.toLocaleTimeString()}`;
-                
+                statusLabel.style.color = "var(--text-muted)";
+
                 // If user didn't provide a name, server generated one, let's keep it in the hidden field 
                 // so we don't keep creating new random sessions on every save.
                 const currentFullName = data.session_name; // e.g., Session-12345-08032026
                 document.getElementById('current_session_full_name').value = currentFullName;
-                
+
                 // If the user input was empty, fill it with the server-generated base name
                 if (!sessionNameInput) {
                     // Extract base name by removing the "-ddmmyyyy" part
                     const baseName = currentFullName.substring(0, currentFullName.lastIndexOf('-'));
                     document.getElementById('session_name_input').value = baseName;
                 }
-                
+
                 lastSavedContent = foodList;
             } else {
                 statusLabel.textContent = "Failed to save";
@@ -284,7 +302,7 @@
     async function recoverSession() {
         const sessionNameInput = document.getElementById('session_name_input').value.trim();
         const statusLabel = document.getElementById('save_status');
-        
+
         if (!sessionNameInput) {
             alert("Please enter a Session Name to recover.");
             return;
@@ -292,25 +310,27 @@
 
         statusLabel.textContent = "Recovering...";
         statusLabel.style.color = "var(--text-muted)";
-        
+
         try {
             const response = await fetch(`/api/sessions/load/${encodeURIComponent(sessionNameInput)}`);
             const data = await response.json();
-            
+
             if (response.ok && data.status === 'success') {
                 document.getElementById('manual_food_list').value = data.data.food_list;
                 lastSavedContent = data.data.food_list; // Sync
-                
-                statusLabel.textContent = "Session recovered!";
+
+                // Set session active so we auto-save future edits to this recovered session
+                isSessionActive = true;
+                statusLabel.textContent = "Session recovered! Auto-saving...";
                 statusLabel.style.color = "var(--brand-teal)";
-                
+
                 // Briefly flash the textarea
                 const ta = document.getElementById('manual_food_list');
                 ta.style.backgroundColor = "#e8f4f8";
                 setTimeout(() => ta.style.backgroundColor = "", 500);
             } else {
                 alert(data.error || "Failed to recover session.");
-                statusLabel.textContent = "Recovery failed";
+                statusLabel.textContent = "Recovery failed (Start a new session)";
             }
         } catch (error) {
             console.error("Recover error:", error);

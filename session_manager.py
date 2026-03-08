@@ -131,6 +131,33 @@ def get_active_sessions():
         except Exception:
             pass # Ignore corrupted files
             
-    # Sort by remaining time (lowest first)
     sessions.sort(key=lambda x: x['remaining_mins'])
     return sessions
+
+def get_session_content(full_session_name):
+    """
+    Attempts to read the food_list directly using the exact session name.
+    Useful for bot commands where the exact name is provided.
+    """
+    _cleanup_expired_sessions()
+    
+    if not full_session_name:
+        return None, "No session name provided."
+        
+    full_session_name = full_session_name.replace("/", "").replace("\\", "").strip()
+    # Strip .json if the user accidentally included it
+    if full_session_name.endswith('.json'):
+        full_session_name = full_session_name[:-5]
+        
+    filename = f"{full_session_name}.json"
+    filepath = os.path.join(SESSION_DIR, filename)
+    
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            return data.get('food_list', ''), None
+        except Exception as e:
+            return None, f"Error reading session: {e}"
+            
+    return None, f"Session '{full_session_name}' not found or has expired."

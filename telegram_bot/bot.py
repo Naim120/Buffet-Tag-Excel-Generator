@@ -137,7 +137,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "If an item is missing, I'll ask you for details."
     )
     if user_id == ADMIN_USER_ID:
-        msg += "\n\nAdmin Commands:\n/add_single - Add new item\n/add_multiple - Bulk upload\n/sessions - View active web sessions\n/add_user <id> - Allow user"
+        msg += "\n\nAdmin Commands:\n/add_single - Add new item\n/add_multiple - Bulk upload\n/sessions - View active web sessions\n/get_session <name> - Get session data\n/add_user <id> - Allow user"
     
     await update.message.reply_text(msg)
 
@@ -164,6 +164,30 @@ async def sessions_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         
     await update.message.reply_text("\n".join(msg_lines), parse_mode='Markdown')
+
+async def get_session_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command to retrieve content of a specific web session."""
+    if update.effective_user.id != ADMIN_USER_ID:
+        await update.message.reply_text("Unauthorized.")
+        return
+        
+    if not context.args:
+        await update.message.reply_text("Usage: `/get_session <session_name>`", parse_mode='Markdown')
+        return
+        
+    session_name = " ".join(context.args)
+    content, error = session_manager.get_session_content(session_name)
+    
+    if error:
+        await update.message.reply_text(error)
+        return
+        
+    if not content.strip():
+        await update.message.reply_text("Session is empty.")
+        return
+        
+    # Reply with monospace formatting
+    await update.message.reply_text(f"Session Data for `{session_name}`:\n\n```\n{content}\n```", parse_mode='Markdown')
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_allowed(update.effective_user.id):
@@ -581,6 +605,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CommandHandler('add_user', add_user_command))
     application.add_handler(CommandHandler('sessions', sessions_command))
+    application.add_handler(CommandHandler('get_session', get_session_command))
     
     # Register conversation handlers
     # Order matters? Specific commands usually first.
